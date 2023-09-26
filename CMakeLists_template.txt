@@ -1,0 +1,109 @@
+# 指定CMake的最低版本
+cmake_minimum_required(VERSION 3.5)
+
+# 指定工程名
+project(ND-GUI VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# 设置Qt工具链的环境变量
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# 设置C++版本
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+#设置UIC的查找路径，UIC默认会在引用ui头文件的源代码路径下查找ui文件，而我们的ui文件存放在/ui文件夹下
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
+#执行程序生成路径
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+#头文件
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/3rdparty)
+
+
+# 查找Qt库 这里是其中的关键，如果没配置好bin/mscv的路径可能会找不到，也可能你安装Qt时没勾选安装
+find_package(QT NAMES  Qt5 REQUIRED COMPONENTS Core Gui Widgets Network SerialPort PrintSupport Xml DataVisualization)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Widgets Network SerialPort PrintSupport Xml DataVisualization)
+
+
+# 将各个文件夹下的所有文件打包
+FILE(GLOB ${PROJECT_NAME}_HEADER "include/*.h")
+FILE(GLOB ${PROJECT_NAME}_SOURCES "src/*.cpp")
+FILE(GLOB ${PROJECT_NAME}_UI "ui/*.ui")
+FILE(GLOB ${PROJECT_NAME}_QRC "qrc/*.qrc")
+
+# 将Qt库链接到目标中
+if(WIN32)
+    #设置Windows程序启动默认不需要控制台CMD
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+    link_directories(${PROJECT_SOURCE_DIR}/lib)
+else()
+    link_directories(/usr/local/lib)
+endif()
+
+
+#生成执行文件 这里我还链接了一个qrc目录下的rc文件 里面记录了我程序的样式以及图标
+#（如果没有可以去掉"qrc/ND-GUI.rc"）
+add_executable(${PROJECT_NAME} "qrc/ND-GUI.rc" ${${PROJECT_NAME}_QRC} ${${PROJECT_NAME}_UI} ${${PROJECT_NAME}_HEADER} ${${PROJECT_NAME}_SOURCES})
+if(WIN32)
+target_link_libraries(${PROJECT_NAME}
+    Qt5::Widgets
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Network
+    Qt5::SerialPort
+    Qt5::PrintSupport
+    Qt5::Xml
+    Qt5::DataVisualization
+)
+else()
+#Linux的配置大多数需要链接pthread线程库
+target_link_libraries(${PROJECT_NAME}
+    Qt5::Widgets
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Network
+    Qt5::SerialPort
+    Qt5::Xml
+    Qt5::DataVisualization
+    pthread
+)
+endif()
+
+#调用预编译器MOC，需要使用 QT5_WRAP_CPP宏
+QT5_WRAP_CPP(${PROJECT_NAME}_SOURCE_MOC ${${PROJECT_NAME}_SOURCE})
+
+#使用UIC处理.ui文件
+QT5_WRAP_UI(${PROJECT_NAME}_UI_HEADER ${${PROJECT_NAME}_UI})
+
+#使用RCC处理.qrc文件
+QT5_ADD_RESOURCES(${PROJECT_NAME}_RCC ${${PROJECT_NAME}_UIC})
+
+# ==================这里使用了Qt的预言家功能，为了实现多国语言翻译，不需要可以去掉===================
+# 查找Qt翻译工具
+find_package(QT NAMES Qt6 Qt5 COMPONENTS LinguistTools REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools REQUIRED)
+
+# 初始化要使用的列表
+set(TS_FILES)
+set(QM_FILES)
+
+# 将要生成的翻译文件添加到列表中 这里生成两个ts分别时英文和中文
+list(APPEND TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/qrc/english.ts)
+list(APPEND TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/qrc/chinese.ts)
+# 设置翻译文件的生成路径，如果不指定就会生成在CMakeFiles的目录里
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/qrc)
+
+# 创建翻译的最关键一步，这一步会根据源码中带有tr标识的语句识别假如到ts文件中
+qt5_create_translation(QM_FILES ${TS_FILES} ${${PROJECT_NAME}_SOURCES})
+message("-------------------------打印一下----------------------------")
+message(${QM_FILES})
+# 添加更新翻译的目标
+add_custom_target(lupdate_task DEPENDS ${TS_FILES})
+add_custom_target(lrelease_task DEPENDS ${QM_FILES})
+# ===============================================================================================

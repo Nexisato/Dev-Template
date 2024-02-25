@@ -20,8 +20,10 @@ private:
         }
     }
 public:
+    MyPtr(): _ptr(nullptr), _count(new int(0)) {}
     explicit MyPtr(T* ptr = nullptr) : _ptr(ptr), _count(ptr ? new int(1) : nullptr) {
     }
+
 
     // copy
     MyPtr(const MyPtr<T>& other) : _ptr(other._ptr), _count(other._count) {

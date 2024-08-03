@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:\\mingw64\\include",
+                "C:\\mingw64\\x86_64-w64-mingw32\\include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22000.0",
+            "compilerPath": "C:/mingw64/bin/g++.exe",
+            "cStandard": "c23",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "windows-gcc-x64",
+            "compilerArgs": [
+                "-g",
+                "-std=c++20",
+                "${file}",
+                "-o",
+                "${fileDirname}\\\\${fileBasenameNoExtension}.exe"
+            ]
+        }
+    ],
+    "version": 4
+}

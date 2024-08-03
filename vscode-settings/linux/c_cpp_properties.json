@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "name": "WSL2",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${CPLUS_INCLUDE_PATH}",
+                "${C_INCLUDE_PATH}"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c23",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "${default}",
+            "compilerArgs": [
+                "-g",
+                "-std=c++20",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}"
+            ]
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c23",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

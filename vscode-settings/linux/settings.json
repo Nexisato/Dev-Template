@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "vector": "cpp",
+        "iostream": "cpp",
+        "algorithm": "cpp",
+        "unordered_map": "cpp"
+    },
+    "[dockercompose]": {
+        "editor.tabSize": 4
+    },
+    "[yaml]": {
+        "editor.tabSize": 4
+    },
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, IndentWidth: 4,  TabWidth: 4, BreakBeforeBraces: Attach, AccessModifierOffset: -4}",
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: LLVM, IndentWidth: 4,  TabWidth: 4, BreakBeforeBraces: Attach, AccessModifierOffset: -4}"
+}
